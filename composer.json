@@ -1,0 +1,5 @@
+{
+    "require": {
+        "infyomlabs/adminlte-templates": "^6.0"
+    }
+}
