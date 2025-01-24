@@ -1,0 +1,24 @@
+@extends('layouts.app')
+
+@section('content')
+    <div class="container">
+        <h1>Add Department</h1>
+        <form action="{{ route('departments.store') }}" method="POST">
+            @csrf
+            <div class="mb-3">
+                <label for="department_name" class="form-label">Department Name</label>
+                <input type="text" name="department_name" class="form-control" id="department_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="head_of_department" class="form-label">Head of Department</label>
+                <select name="head_of_department" id="head_of_department" class="form-control">
+                    <option value="">None</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->user_id }}">{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+@endsection
