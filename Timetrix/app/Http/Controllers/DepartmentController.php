@@ -16,7 +16,7 @@ class DepartmentController extends Controller
 
     public function create()
     {
-        $users = User::where('role', 'Instructor')->get();
+        $users = User::all();
         return view('departments.create', compact('users'));
     }
 
@@ -31,9 +31,9 @@ class DepartmentController extends Controller
         return redirect()->route('departments.index')->with('success', 'Department created successfully.');
     }
 
-    public function edit(Department $department)
+   public function edit(Department $department)
     {
-        $users = User::where('role', 'Instructor')->get();
+        $users = User::all();
         return view('departments.edit', compact('department', 'users'));
     }
 
