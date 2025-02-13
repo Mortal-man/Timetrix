@@ -9,25 +9,19 @@ class Instructor extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'instructor_id';
+    protected $primaryKey = 'instructor_id'; // Set custom primary key
 
     protected $fillable = [
-        'user_id',
-        'expertise',
+        'instructor_name',
         'availability',
         'department_id',
     ];
 
     protected $casts = [
-        'availability' => 'array',
+        'availability' => 'array', // Store availability as JSON array
     ];
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function department()
     {
         return $this->belongsTo(Department::class, 'department_id');
     }

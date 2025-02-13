@@ -9,10 +9,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap">
 @endsection
 
-@section('content_header')
-    <h1 class="m-0 text-dark">Dashboard</h1>
-@endsection
-
 @section('content')
     <!-- Main Content -->
     <div class="container-fluid">

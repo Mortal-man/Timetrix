@@ -11,7 +11,9 @@ class CreateDepartmentsTable extends Migration
         Schema::create('departments', function (Blueprint $table) {
             $table->id('department_id');
             $table->string('department_name');
-            $table->foreignId('head_of_department')->nullable()->constrained('users')->onDelete('set null');
+            $table->string('department_code')->unique();
+            $table->unsignedBigInteger('faculty_id');
+            $table->string('head_of_department');
             $table->timestamps();
         });
     }

@@ -13,14 +13,6 @@
                 <label for="capacity" class="form-label">Capacity</label>
                 <input type="number" name="capacity" class="form-control" id="capacity" required>
             </div>
-            <div class="mb-3">
-                <label for="equipment" class="form-label">Equipment</label>
-                <input type="text" name="equipment" class="form-control" id="equipment">
-            </div>
-            <div class="mb-3">
-                <label for="location" class="form-label">Location</label>
-                <input type="text" name="location" class="form-control" id="location" required>
-            </div>
             <button type="submit" class="btn btn-primary">Save</button>
         </form>
     </div>

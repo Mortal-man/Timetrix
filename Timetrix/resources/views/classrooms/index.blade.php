@@ -13,8 +13,6 @@
                 <th>#</th>
                 <th>Room Name</th>
                 <th>Capacity</th>
-                <th>Equipment</th>
-                <th>Location</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -24,8 +22,6 @@
                     <td>{{ $classroom->classroom_id }}</td>
                     <td>{{ $classroom->room_name }}</td>
                     <td>{{ $classroom->capacity }}</td>
-                    <td>{{ $classroom->equipment ?? 'None' }}</td>
-                    <td>{{ $classroom->location }}</td>
                     <td>
                         <a href="{{ route('classrooms.edit', $classroom) }}" class="btn btn-warning">Edit</a>
                         <form action="{{ route('classrooms.destroy', $classroom) }}" method="POST" style="display:inline;">

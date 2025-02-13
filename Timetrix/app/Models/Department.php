@@ -9,15 +9,17 @@ class Department extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'department_id';
+    protected $primaryKey = 'department_id'; // Custom primary key
 
     protected $fillable = [
         'department_name',
+        'department_code',
+        'faculty_id',
         'head_of_department',
     ];
 
-    public function head(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function faculty()
     {
-        return $this->belongsTo(User::class, 'head_of_department');
+        return $this->belongsTo(Faculty::class, 'faculty_id');
     }
 }

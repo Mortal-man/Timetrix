@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'Timetrix',
+    'title' => 'Timetrix ',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -219,7 +219,7 @@ return [
     'sidebar_collapse_auto_size' => false,
     'sidebar_collapse_remember' => false,
     'sidebar_collapse_remember_no_transition' => true,
-    'sidebar_scrollbar_theme' => 'os-theme-dark',
+    'sidebar_scrollbar_theme' => 'os-theme-light',
     'sidebar_scrollbar_auto_hide' => 'l',
     'sidebar_nav_accordion' => true,
     'sidebar_nav_animation_speed' => 300,
@@ -241,7 +241,7 @@ return [
     'right_sidebar_theme' => 'dark',
     'right_sidebar_slide' => true,
     'right_sidebar_push' => true,
-    'right_sidebar_scrollbar_theme' => 'os-theme-dark',
+    'right_sidebar_scrollbar_theme' => 'os-theme-light',
     'right_sidebar_scrollbar_auto_hide' => 'l',
 
     /*
@@ -297,13 +297,20 @@ return [
     | https://github.com/jeroennoten/Laravel-AdminLTE/wiki/Menu-Configuration
     |
     */
+
     'menu' => [
+
         [
             'text'        => 'Dashboard',
             'url'         => 'dashboard',
             'icon'        => 'fas fa-fw fa-tachometer-alt',
         ],
         ['header' => 'Management'],
+        [
+            'text'        => 'Faculties',
+            'url'         => 'faculties',
+            'icon'        => 'fas fa-fw fa-graduation-cap',
+        ],
         [
             'text'        => 'Departments',
             'url'         => 'departments',
@@ -330,8 +337,8 @@ return [
             'icon'        => 'fas fa-fw fa-calendar-alt',
         ],
         [
-            'text'        => 'Timetables',
-            'url'         => 'timetables',
+            'text'        => 'Timetable',
+            'url'         => 'timetable',
             'icon'        => 'fas fa-fw fa-table',
         ],
         [
@@ -339,8 +346,8 @@ return [
             'url'         => 'users',
             'icon'        => 'fas fa-fw fa-users',
         ],
-    ],
 
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -495,5 +502,4 @@ return [
     */
 
     'livewire' => false,
-
 ];

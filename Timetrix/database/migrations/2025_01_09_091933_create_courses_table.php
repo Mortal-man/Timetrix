@@ -12,8 +12,9 @@ class CreateCoursesTable extends Migration
             $table->id('course_id');
             $table->string('course_name');
             $table->string('course_code')->unique();
+            $table->unsignedBigInteger('instructor_id'); // column for the foreign key
+            $table->integer('student_enrollment');
             $table->unsignedBigInteger('department_id'); // Column for the foreign key
-            $table->integer('credits');
             $table->string('semester');
             $table->timestamps();
         });

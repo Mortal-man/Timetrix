@@ -10,8 +10,7 @@ class CreateInstructorsTable extends Migration
     {
         Schema::create('instructors', function (Blueprint $table) {
             $table->id('instructor_id');
-            $table->unsignedBigInteger('user_id'); // Column for the foreign key
-            $table->string('expertise');
+            $table->string('instructor_name');
             $table->json('availability');
             $table->unsignedBigInteger('department_id'); // Column for the foreign key
             $table->timestamps();

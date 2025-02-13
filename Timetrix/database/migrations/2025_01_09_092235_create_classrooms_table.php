@@ -12,8 +12,6 @@ class CreateClassroomsTable extends Migration
             $table->id('classroom_id');
             $table->string('room_name');
             $table->integer('capacity');
-            $table->string('equipment')->nullable();
-            $table->string('location');
             $table->timestamps();
         });
     }

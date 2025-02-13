@@ -23,8 +23,6 @@ class ClassroomController extends Controller
         $request->validate([
             'room_name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
-            'equipment' => 'nullable|string',
-            'location' => 'required|string|max:255',
         ]);
 
         Classroom::create($request->all());
@@ -41,8 +39,6 @@ class ClassroomController extends Controller
         $request->validate([
             'room_name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
-            'equipment' => 'nullable|string',
-            'location' => 'required|string|max:255',
         ]);
 
         $classroom->update($request->all());

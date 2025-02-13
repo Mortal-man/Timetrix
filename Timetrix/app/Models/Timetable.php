@@ -9,35 +9,20 @@ class Timetable extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'timetable_id';
+    protected $fillable = ['day', 'hour', 'course_id', 'instructor_id', 'classroom_id'];
 
-    protected $fillable = [
-        'course_id',
-        'instructor_id',
-        'classroom_id',
-        'schedule_id',
-        'semester',
-        'status',
-    ];
-
-    // Define relationships
-    public function course(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function course()
     {
-        return $this->belongsTo(Course::class, 'course_id');
+        return $this->belongsTo(Course::class);
     }
 
-    public function instructor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function instructor()
     {
-        return $this->belongsTo(Instructor::class, 'instructor_id');
+        return $this->belongsTo(Instructor::class);
     }
 
-    public function classroom(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function classroom()
     {
-        return $this->belongsTo(Classroom::class, 'classroom_id');
-    }
-
-    public function schedule(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Schedule::class, 'schedule_id');
+        return $this->belongsTo(Classroom::class);
     }
 }

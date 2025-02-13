@@ -8,7 +8,7 @@ use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\TimetableController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FacultyController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,6 +29,15 @@ Route::resource('instructors', InstructorController::class);
 Route::resource('classrooms', ClassroomController::class);
 Route::resource('schedules', ScheduleController::class);
 Route::resource('timetables', TimetableController::class);
+Route::resource('faculties', FacultyController::class);
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/instructors-by-department/{department_id}', [CourseController::class, 'getInstructorsByDepartment']);
+
+Route::get('/timetable/generate', [TimetableController::class, 'generate'])->name('timetable.generate');
+Route::get('/timetable', [TimetableController::class, 'index'])->name('timetable.index');
+
+Route::get('/timetable/manual', [TimetableController::class, 'manual'])->name('timetable.manual');
+Route::post('/timetable/manual', [TimetableController::class, 'storeManual'])->name('timetable.storeManual');
+
+
 require __DIR__.'/auth.php';

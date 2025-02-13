@@ -3,60 +3,109 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Instructor;
 use App\Models\Department;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
+    /**
+     * Display a listing of courses.
+     */
     public function index()
     {
-        $courses = Course::with('department')->paginate(10);
+        $courses = Course::with(['instructor', 'department'])->paginate(10);
         return view('courses.index', compact('courses'));
     }
 
+    /**
+     * Show the form for creating a new course.
+     */
     public function create()
     {
         $departments = Department::all();
-        return view('courses.create', compact('departments'));
+        $instructors = Instructor::all();
+        return view('courses.create', compact('departments', 'instructors'));
     }
 
+    /**
+     * Store a newly created course in the database.
+     */
     public function store(Request $request)
     {
         $request->validate([
             'course_name' => 'required|string|max:255',
-            'course_code' => 'required|string|max:10|unique:courses,course_code',
-            'department_id' => 'required|exists:departments,department_id',
-            'credits' => 'required|integer|min:1|max:10',
-            'semester' => 'required|string|max:10',
+            'course_code' => 'required|string|max:255|unique:courses,course_code',
+            'instructor_id' => 'required|exists:instructors,instructor_id', // Ensure instructor exists
+            'student_enrollment' => 'required|integer|min:1',
+            'department_id' => 'required|exists:departments,department_id', // Ensure department exists
+            'semester' => 'required|string|max:255',
         ]);
 
-        Course::create($request->all());
-        return redirect()->route('courses.index')->with('success', 'Course created successfully.');
+        Course::create([
+            'course_name' => $request->course_name,
+            'course_code' => $request->course_code,
+            'instructor_id' => $request->instructor_id,
+            'student_enrollment' => $request->student_enrollment,
+            'department_id' => $request->department_id,
+            'semester' => $request->semester,
+        ]);
+
+        return redirect()->route('courses.index')->with('success', 'Course added successfully.');
     }
 
-    public function edit(Course $course)
+    /**
+     * Show the form for editing the specified course.
+     */
+    public function edit($id)
     {
+        $course = Course::findOrFail($id);
         $departments = Department::all();
-        return view('courses.edit', compact('course', 'departments'));
+        $instructors = Instructor::all();
+        return view('courses.edit', compact('course', 'departments', 'instructors'));
     }
 
-    public function update(Request $request, Course $course)
+    /**
+     * Update the specified course in the database.
+     */
+    public function update(Request $request, $id)
     {
         $request->validate([
             'course_name' => 'required|string|max:255',
-            'course_code' => "required|string|max:10|unique:courses,course_code,{$course->course_id},course_id",
+            'course_code' => 'required|string|max:255|unique:courses,course_code,' . $id . ',course_id',
+            'instructor_id' => 'required|exists:instructors,instructor_id',
+            'student_enrollment' => 'required|integer|min:1',
             'department_id' => 'required|exists:departments,department_id',
-            'credits' => 'required|integer|min:1|max:10',
-            'semester' => 'required|string|max:10',
+            'semester' => 'required|string|max:255',
         ]);
 
-        $course->update($request->all());
+        $course = Course::findOrFail($id);
+        $course->update([
+            'course_name' => $request->course_name,
+            'course_code' => $request->course_code,
+            'instructor_id' => $request->instructor_id,
+            'student_enrollment' => $request->student_enrollment,
+            'department_id' => $request->department_id,
+            'semester' => $request->semester,
+        ]);
+
         return redirect()->route('courses.index')->with('success', 'Course updated successfully.');
     }
 
-    public function destroy(Course $course)
+    /**
+     * Remove the specified course from the database.
+     */
+    public function destroy($id)
     {
+        $course = Course::findOrFail($id);
         $course->delete();
+
         return redirect()->route('courses.index')->with('success', 'Course deleted successfully.');
     }
+    public function getInstructorsByDepartment($department_id)
+    {
+        $instructors = Instructor::where('department_id', $department_id)->get(['instructor_id', 'instructor_name']);
+        return response()->json($instructors);
+    }
+
 }
