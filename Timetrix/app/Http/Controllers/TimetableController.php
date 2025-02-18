@@ -18,6 +18,7 @@ class TimetableController extends Controller
         $timetable = \App\Models\Timetable::with(['course', 'instructor', 'classroom'])->get();
         return view('timetable.index', compact('timetable'));
     }
+
     public function generate()
     {
         Timetable::truncate(); // Clear previous timetable data
@@ -28,6 +29,8 @@ class TimetableController extends Controller
         $classrooms = Classroom::orderBy('capacity', 'asc')->get(); // Sort classrooms by capacity
 
         $unscheduledCourses = [];
+// Track the instructor's next available slot after scheduling
+        $instructorNextAvailable = [];
 
         foreach ($courses as $course) {
             $instructor = $course->instructor;
@@ -37,70 +40,64 @@ class TimetableController extends Controller
                 continue;
             }
 
-            // Decode availability (stored as available days, not time slots)
             $availability = json_decode($instructor->availability, true);
             if (!$availability || empty($availability)) {
-                \Log::warning("Instructor ID: {$instructor->instructor_id} has no availability set.");
+                \Log::warning("Instructor ID: {$instructor->instructor_id} has no availability set for Course ID: {$course->course_id}.");
                 $unscheduledCourses[] = $course;
                 continue;
             }
 
-            $remainingHours = 3; // Each course requires 3 hours per week
+            $remainingHours = 3;
             $scheduled = false;
-
-            // Prioritize session splitting options (3hr, 2+1hr, 1+1+1hr)
             $sessionOptions = [[3], [2, 1], [1, 1, 1]];
             shuffle($sessionOptions);
 
             foreach ($sessionOptions as $option) {
                 foreach ($option as $session) {
-                    foreach ($days as $day) {
+                    foreach ($availability as $day) { // Prioritize instructor's available days
                         if ($remainingHours <= 0) break;
-                        if (!in_array($day, $availability)) continue; // Check if instructor is available on this day
+
+                        $nextAvailableHour = $instructorNextAvailable[$instructor->instructor_id][$day] ?? 7; // Default to 7 AM
 
                         foreach ($timeSlots as $hour) {
-                            if ($remainingHours <= 0) break;
+                            if ($hour < $nextAvailableHour) continue; // Skip slots before the instructor's next availability
+                            if ($remainingHours <= 0 || ($hour + $session - 1) > 17) break; // Prevent overflow past 5 PM
 
-                            // Ensure the instructor isn't already scheduled at this time
-                            $instructorBooked = Timetable::where('day', $day)
-                                ->where('hour', $hour)
-                                ->where('instructor_id', $instructor->instructor_id)
-                                ->exists();
+                            foreach ($classrooms as $classroom) {
+                                if ($classroom->capacity < $course->student_enrollment) continue;
 
-                            if ($instructorBooked) continue;
+                                $instructorBooked = Timetable::where('day', $day)
+                                    ->whereBetween('hour', [$hour, $hour + $session - 1])
+                                    ->where('instructor_id', $instructor->instructor_id)
+                                    ->exists();
 
-                            // Find an available classroom with enough capacity
-                            $classroom = $classrooms->firstWhere('capacity', '>=', $course->student_enrollment);
+                                if ($instructorBooked) continue;
 
-                            if (!$classroom) {
-                                \Log::error("No classroom found for Course ID: {$course->course_id}. Required capacity: {$course->student_enrollment}. Available classrooms: " . $classrooms->pluck('capacity')->toJson());
-                                continue; // Skip scheduling this session
-                            } else {
-                                \Log::info("Classroom found for Course ID: {$course->course_id}: Classroom ID: {$classroom->id}, Capacity: {$classroom->capacity}");
+                                $slotTaken = Timetable::where('day', $day)
+                                    ->whereBetween('hour', [$hour, $hour + $session - 1])
+                                    ->where('classroom_id', $classroom->classroom_id)
+                                    ->exists();
+
+                                if ($slotTaken) continue;
+
+                                // Schedule the course
+                                for ($i = 0; $i < $session; $i++) {
+                                    Timetable::create([
+                                        'day' => $day,
+                                        'hour' => $hour + $i,
+                                        'course_id' => $course->course_id,
+                                        'instructor_id' => $instructor->instructor_id,
+                                        'classroom_id' => $classroom->classroom_id,
+                                    ]);
+                                }
+
+                                // Update instructor’s next availability
+                                $instructorNextAvailable[$instructor->instructor_id][$day] = $hour + $session;
+
+                                $remainingHours -= $session;
+                                $scheduled = true;
+                                break 3;
                             }
-
-                            // Ensure the classroom isn't already booked at this time
-                            $slotTaken = Timetable::where('day', $day)
-                                ->where('hour', $hour)
-                                ->where('classroom_id', $classroom->id)
-                                ->exists();
-
-                            if ($slotTaken) continue;
-
-                            // Schedule the course in this time slot
-                            for ($i = 0; $i < $session; $i++) {
-                                Timetable::create([
-                                    'day' => $day,
-                                    'hour' => $hour + $i,
-                                    'course_id' => $course->course_id,
-                                    'instructor_id' => $instructor->instructor_id,
-                                    'classroom_id' => $classroom->id, // Ensure classroom_id is not null
-                                ]);
-                            }
-
-                            $remainingHours -= $session;
-                            $scheduled = true;
-                            break 2; // Move to the next session set
                         }
                     }
                 }
@@ -112,13 +109,17 @@ class TimetableController extends Controller
             }
         }
 
-        // Store unscheduled courses in the session
+
         session(['unscheduled_courses' => $unscheduledCourses]);
 
         if (!empty($unscheduledCourses)) {
             return redirect()->route('timetable.manual')->with('warning', 'Some courses could not be scheduled. Please assign them manually.');
         }
+
+        return redirect()->route('timetable.index')->with('success', 'Timetable generated successfully!');
     }
+
+
     public function manual()
     {
         $unscheduledCourses = session('unscheduled_courses', []);
@@ -131,7 +132,7 @@ class TimetableController extends Controller
     public function storeManual(Request $request)
     {
         $request->validate([
-            'course_id' => 'required|exists:courses,course_id',
+            'course_id' => 'required |exists:courses,course_id',
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday',
             'hour' => 'required|integer|min:7|max:17',
             'instructor_id' => 'required|exists:instructors,instructor_id',
@@ -148,6 +149,7 @@ class TimetableController extends Controller
 
         return redirect()->route('timetable.manual')->with('success', 'Course manually scheduled successfully!');
     }
+
     public function view()
     {
         $timetable = Timetable::with(['course', 'instructor', 'classroom'])->get();
@@ -157,6 +159,7 @@ class TimetableController extends Controller
 
         return view('timetable.view', compact('timetable', 'courses', 'instructors', 'classrooms'));
     }
+
     public function updateEntry(Request $request)
     {
         $request->validate([
@@ -179,6 +182,4 @@ class TimetableController extends Controller
 
         return redirect()->route('timetable.view')->with('success', 'Timetable updated successfully!');
     }
-
-
 }

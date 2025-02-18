@@ -20,9 +20,9 @@
                 <tr>
                     <td>{{ $entry->day }}</td>
                     <td>{{ $entry->hour }}:00 - {{ $entry->hour + 1 }}:00</td>
-                    <td>{{ $entry->course->course_name }}</td>
-                    <td>{{ $entry->instructor->instructor_name }}</td>
-                    <td>{{ $entry->classroom->room_name }}</td>
+                    <td>{{ optional($entry->course)->course_name ?? 'Course Not Found' }}</td>
+                    <td>{{ optional($entry->instructor)->instructor_name ?? 'Instructor Not Found' }}</td>
+                    <td>{{ optional($entry->classroom)->room_name ?? 'Classroom Not Found' }}</td>
                 </tr>
             @endforeach
             </tbody>
