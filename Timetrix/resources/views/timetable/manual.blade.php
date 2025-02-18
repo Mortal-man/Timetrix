@@ -8,7 +8,7 @@
             <div class="alert alert-warning">{{ session('warning') }}</div>
         @endif
 
-        @if ($unscheduledCourses->isEmpty())
+        @if (empty($unscheduledCourses))
             <div class="alert alert-success">All courses have been scheduled successfully!</div>
         @else
             <form action="{{ route('timetable.storeManual') }}" method="POST">

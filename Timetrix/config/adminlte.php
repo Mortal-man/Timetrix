@@ -317,14 +317,14 @@ return [
             'icon'        => 'fas fa-fw fa-building',
         ],
         [
-            'text'        => 'Courses',
-            'url'         => 'courses',
-            'icon'        => 'fas fa-fw fa-book',
-        ],
-        [
             'text'        => 'Instructors',
             'url'         => 'instructors',
             'icon'        => 'fas fa-fw fa-chalkboard-teacher',
+        ],
+        [
+            'text'        => 'Courses',
+            'url'         => 'courses',
+            'icon'        => 'fas fa-fw fa-book',
         ],
         [
             'text'        => 'Classrooms',

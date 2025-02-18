@@ -20,25 +20,35 @@ class TimetableController extends Controller
     }
     public function generate()
     {
-        Timetable::truncate();
+        Timetable::truncate(); // Clear previous timetable data
+
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-        $timeSlots = range(7, 17); // 7 AM to 5 PM
+        $timeSlots = range(7, 17); // 7 AM to 5 PM (1-hour slots)
         $courses = Course::with('instructor')->get();
-        $classrooms = Classroom::orderBy('capacity', 'asc')->get();
+        $classrooms = Classroom::orderBy('capacity', 'asc')->get(); // Sort classrooms by capacity
 
         $unscheduledCourses = [];
 
         foreach ($courses as $course) {
             $instructor = $course->instructor;
             if (!$instructor) {
+                \Log::warning("Course ID: {$course->course_id} has no assigned instructor.");
                 $unscheduledCourses[] = $course;
                 continue;
             }
 
+            // Decode availability (stored as available days, not time slots)
             $availability = json_decode($instructor->availability, true);
-            $remainingHours = 3;
+            if (!$availability || empty($availability)) {
+                \Log::warning("Instructor ID: {$instructor->instructor_id} has no availability set.");
+                $unscheduledCourses[] = $course;
+                continue;
+            }
+
+            $remainingHours = 3; // Each course requires 3 hours per week
             $scheduled = false;
 
+            // Prioritize session splitting options (3hr, 2+1hr, 1+1+1hr)
             $sessionOptions = [[3], [2, 1], [1, 1, 1]];
             shuffle($sessionOptions);
 
@@ -46,22 +56,12 @@ class TimetableController extends Controller
                 foreach ($option as $session) {
                     foreach ($days as $day) {
                         if ($remainingHours <= 0) break;
-                        if (!isset($availability[$day]) || empty($availability[$day])) continue;
+                        if (!in_array($day, $availability)) continue; // Check if instructor is available on this day
 
                         foreach ($timeSlots as $hour) {
                             if ($remainingHours <= 0) break;
-                            if (!in_array($hour, $availability[$day])) continue;
 
-                            $validSlot = true;
-                            for ($i = 0; $i < $session; $i++) {
-                                if (!in_array($hour + $i, $availability[$day])) {
-                                    $validSlot = false;
-                                    break;
-                                }
-                            }
-
-                            if (!$validSlot) continue;
-
+                            // Ensure the instructor isn't already scheduled at this time
                             $instructorBooked = Timetable::where('day', $day)
                                 ->where('hour', $hour)
                                 ->where('instructor_id', $instructor->instructor_id)
@@ -69,9 +69,17 @@ class TimetableController extends Controller
 
                             if ($instructorBooked) continue;
 
+                            // Find an available classroom with enough capacity
                             $classroom = $classrooms->firstWhere('capacity', '>=', $course->student_enrollment);
-                            if (!$classroom) continue;
 
+                            if (!$classroom) {
+                                \Log::error("No classroom found for Course ID: {$course->course_id}. Required capacity: {$course->student_enrollment}. Available classrooms: " . $classrooms->pluck('capacity')->toJson());
+                                continue; // Skip scheduling this session
+                            } else {
+                                \Log::info("Classroom found for Course ID: {$course->course_id}: Classroom ID: {$classroom->id}, Capacity: {$classroom->capacity}");
+                            }
+
+                            // Ensure the classroom isn't already booked at this time
                             $slotTaken = Timetable::where('day', $day)
                                 ->where('hour', $hour)
                                 ->where('classroom_id', $classroom->id)
@@ -79,24 +87,27 @@ class TimetableController extends Controller
 
                             if ($slotTaken) continue;
 
+                            // Schedule the course in this time slot
                             for ($i = 0; $i < $session; $i++) {
                                 Timetable::create([
                                     'day' => $day,
                                     'hour' => $hour + $i,
                                     'course_id' => $course->course_id,
                                     'instructor_id' => $instructor->instructor_id,
-                                    'classroom_id' => $classroom->id,
+                                    'classroom_id' => $classroom->id, // Ensure classroom_id is not null
                                 ]);
                             }
 
                             $remainingHours -= $session;
                             $scheduled = true;
+                            break 2; // Move to the next session set
                         }
                     }
                 }
             }
 
             if (!$scheduled) {
+                \Log::warning("Course ID: {$course->course_id} could not be scheduled.");
                 $unscheduledCourses[] = $course;
             }
         }
@@ -104,11 +115,9 @@ class TimetableController extends Controller
         // Store unscheduled courses in the session
         session(['unscheduled_courses' => $unscheduledCourses]);
 
-        if (count($unscheduledCourses) > 0) {
+        if (!empty($unscheduledCourses)) {
             return redirect()->route('timetable.manual')->with('warning', 'Some courses could not be scheduled. Please assign them manually.');
         }
-
-        return redirect()->route('timetable.index')->with('success', 'Timetable generated successfully!');
     }
     public function manual()
     {
