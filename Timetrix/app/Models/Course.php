@@ -29,4 +29,8 @@ class Course extends Model
     {
         return $this->belongsTo(Department::class, 'department_id');
     }
+    public function timetable()
+    {
+        return $this->hasMany(Timetable::class, 'course_id', 'course_id');
+    }
 }

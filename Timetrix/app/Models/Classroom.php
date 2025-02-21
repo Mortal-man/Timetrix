@@ -15,4 +15,9 @@ class Classroom extends Model
         'room_name',
         'capacity',
     ];
+
+    public function timetable()
+    {
+        return $this->hasMany(Timetable::class, 'classroom_id', 'classroom_id');
+    }
 }

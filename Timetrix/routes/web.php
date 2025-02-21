@@ -35,6 +35,8 @@ Route::get('/instructors-by-department/{department_id}', [CourseController::clas
 
 Route::get('/timetable/generate', [TimetableController::class, 'generate'])->name('timetable.generate');
 Route::get('/timetable', [TimetableController::class, 'index'])->name('timetable.index');
+Route::get('/timetable/view', [TimetableController::class, 'view'])->name('timetable.view');
+Route::post('/timetable/update', [TimetableController::class, 'update'])->name('timetable.update');
 
 Route::get('/timetable/manual', [TimetableController::class, 'manual'])->name('timetable.manual');
 Route::post('/timetable/manual', [TimetableController::class, 'storeManual'])->name('timetable.storeManual');

@@ -25,4 +25,8 @@ class Instructor extends Model
     {
         return $this->belongsTo(Department::class, 'department_id');
     }
+    public function timetable()
+    {
+        return $this->hasMany(Timetable::class, 'instructor_id', 'instructor_id');
+    }
 }

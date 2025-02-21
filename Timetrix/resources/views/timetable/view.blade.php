@@ -30,9 +30,9 @@
                             @endphp
 
                             @if ($entry)
-                                <strong>{{ $entry->course->course_name }}</strong> <br>
-                                <small>{{ $entry->instructor->instructor_name }}</small> <br>
-                                <small>Room: {{ $entry->classroom->room_name }}</small>
+                                <strong>{{ optional($entry->course)->course_name ?? 'Course Not Found' }}</strong> <br>
+                                <small>{{ optional($entry->instructor)->instructor_name ?? 'Instructor Not Found' }}</small> <br>
+                                <small>Room: {{ optional($entry->classroom)->room_name ?? 'Room Not Found' }}</small>
                                 <br>
                                 <button class="btn btn-sm btn-primary edit-btn"
                                         data-id="{{ $entry->id }}"
@@ -76,6 +76,24 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="instructor_id" class="form-label">Instructor</label>
+                            <select name="instructor_id" id="instructor_id" class="form-control">
+                                @foreach ($instructors as $instructor)
+                                    <option value="{{ $instructor->id }}">{{ $instructor->instructor_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="classroom_id" class="form-label">Classroom</label>
+                            <select name="classroom_id" id="classroom_id" class="form-control">
+                                @foreach ($classrooms as $classroom)
+                                    <option value="{{ $classroom->id }}">{{ $classroom->room_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="day" class="form-label">Day</label>
                             <select name="day" id="day" class="form-control">
                                 <option value="Monday">Monday</option>
@@ -90,4 +108,33 @@
                             <label for="hour" class="form-label">Time Slot</label>
                             <select name="hour" id="hour" class="form-control">
                                 @for ($i = 7; $i <= 17; $i++)
-                                    <option
+                                    <option value="{{ $i }}">{{ $i }}:00 - {{ $i+1 }}:00</option>
+                                @endfor
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Modal Data Population -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let editButtons = document.querySelectorAll('.edit-btn');
+
+            editButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    document.getElementById('entry_id').value = this.getAttribute('data-id');
+                    document.getElementById('course_id').value = this.getAttribute('data-course');
+                    document.getElementById('instructor_id').value = this.getAttribute('data-instructor');
+                    document.getElementById('classroom_id').value = this.getAttribute('data-classroom');
+                    document.getElementById('day').value = this.getAttribute('data-day');
+                    document.getElementById('hour').value = this.getAttribute('data-hour');
+                });
+            });
+        });
+    </script>
+@endsection

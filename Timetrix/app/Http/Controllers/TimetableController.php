@@ -16,7 +16,8 @@ class TimetableController extends Controller
     public function index()
     {
         $timetable = \App\Models\Timetable::with(['course', 'instructor', 'classroom'])->get();
-        return view('timetable.index', compact('timetable'));
+        $instructors = Instructor::all();
+        return view('timetable.index', compact('timetable','instructors'));
     }
 
     public function generate()
