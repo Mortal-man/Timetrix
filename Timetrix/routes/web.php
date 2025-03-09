@@ -40,6 +40,6 @@ Route::post('/timetable/update', [TimetableController::class, 'update'])->name('
 
 Route::get('/timetable/manual', [TimetableController::class, 'manual'])->name('timetable.manual');
 Route::post('/timetable/manual', [TimetableController::class, 'storeManual'])->name('timetable.storeManual');
-
+Route::get('/timetable/pdf', [TimetableController::class, 'generatePDF'])->name('timetable.pdf');
 
 require __DIR__.'/auth.php';

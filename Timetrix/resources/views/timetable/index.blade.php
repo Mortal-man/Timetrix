@@ -5,10 +5,12 @@
         <h1>Generated Timetable</h1>
 
         <!-- Buttons for Actions -->
-        <div class="d-flex mb-3">
+        <div class="d-flex mb-3 ">
             <a href="{{ route('timetable.generate') }}" class="btn btn-primary me-2">Regenerate Timetable</a>
             <a href="{{ route('timetable.manual') }}" class="btn btn-warning me-2">Manual Scheduling</a>
             <a href="{{ route('timetable.view') }}" class="btn btn-success">View Timetable</a>
+            <a href="{{ route('timetable.pdf') }}" class="btn btn-danger">Download PDF</a>
+
         </div>
 
         <!-- Search and Filter -->

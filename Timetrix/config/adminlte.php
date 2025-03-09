@@ -332,11 +332,6 @@ return [
             'icon'        => 'fas fa-fw fa-school',
         ],
         [
-            'text'        => 'Schedules',
-            'url'         => 'schedules',
-            'icon'        => 'fas fa-fw fa-calendar-alt',
-        ],
-        [
             'text'        => 'Timetable',
             'url'         => 'timetable',
             'icon'        => 'fas fa-fw fa-table',

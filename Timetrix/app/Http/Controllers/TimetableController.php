@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Instructor;
 use App\Models\Classroom;
 use App\Models\Timetable;
+use Barryvdh\DomPDF\Facade\Pdf; // Import DomPDF
 
 class TimetableController extends Controller
 {
@@ -182,5 +183,58 @@ class TimetableController extends Controller
         ]);
 
         return redirect()->route('timetable.view')->with('success', 'Timetable updated successfully!');
+    }
+
+    public function getTimetableStructure()
+    {
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        $timeSlots = range(7, 17); // 7 AM - 5 PM (Hourly slots)
+        $timetableData = [];
+
+        // Fetch all timetable entries with relationships
+        $timetables = Timetable::with(['course.department.faculty', 'instructor', 'classroom'])->get();
+
+        foreach ($days as $day) {
+            $timetableData[$day] = [];
+
+            foreach ($timetables->where('day', $day) as $entry) {
+                $faculty = $entry->course->department->faculty->faculty_name ?? 'Unknown Faculty';
+                $department = $entry->course->department->department_name ?? 'Unknown Department';
+                $courseName = $entry->course->course_name ?? 'Unknown Course';
+                $instructor = $entry->instructor->instructor_name ?? 'No Instructor';
+                $classroom = $entry->classroom->room_name ?? 'No Room';
+
+                // Initialize faculty and department if not set
+                $timetableData[$day][$faculty][$department] = $timetableData[$day][$faculty][$department] ?? [];
+
+                // Place course details into the correct time slots
+                foreach ($timeSlots as $hour) {
+                    if ($entry->hour == $hour) { // Assuming 'hour' is a property of the entry
+                        $timetableData[$day][$faculty][$department][$hour] = [
+                            'course_name' => $courseName,
+                            'instructor' => $instructor,
+                            'classroom' => $classroom,
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $timetableData;
+    }
+
+    /**
+     * Generate and download the timetable PDF.
+     */
+
+    public function generatePDF()
+    {
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        $timeSlots = range(7, 17); // 7 AM to 5 PM
+        $faculties = Course::with(['department.faculty'])->get()->groupBy('department.faculty.faculty_name');
+        $timetable = Timetable::with(['course.department.faculty', 'instructor', 'classroom'])->get();
+
+        $pdf = Pdf::loadView('timetable.pdf', compact('days', 'timeSlots', 'faculties', 'timetable'));
+        return $pdf->setPaper('a4', 'landscape')->download('Timetable.pdf');
     }
 }
