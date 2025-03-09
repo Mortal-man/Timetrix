@@ -116,7 +116,7 @@
     <h1>Welcome to Timetrix</h1>
     <p>Timetrix helps you generate organized and efficient timetables with ease. Whether for schools, colleges, or personal schedules, our tool makes scheduling seamless.</p>
     <div class="resources">
-        <a href="#">Documentation</a>
+        <a href="#">Documentations</a>
         <a href="#">Tutorials</a>
         <a href="#">Community</a>
     </div>
