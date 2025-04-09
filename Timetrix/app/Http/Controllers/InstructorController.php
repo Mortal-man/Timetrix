@@ -33,14 +33,14 @@ class InstructorController extends Controller
     {
         $request->validate([
             'instructor_name' => 'required|string|max:255',
-            'availability' => 'required|array|min:1', // Must select at least one weekday
-            'availability.*' => 'in:Monday,Tuesday,Wednesday,Thursday,Friday', // Restrict to weekdays
+            //'availability' => 'required|array|min:1', // Must select at least one weekday
+            //'availability.*' => 'in:Monday,Tuesday,Wednesday,Thursday,Friday', // Restrict to weekdays
             'department_id' => 'required|exists:departments,department_id', // Ensure it exists
         ]);
 
         Instructor::create([
             'instructor_name' => $request->instructor_name,
-            'availability' => json_encode($request->availability), // Store as JSON
+            //'availability' => json_encode($request->availability), // Store as JSON
             'department_id' => $request->department_id,
         ]);
 
@@ -64,15 +64,15 @@ class InstructorController extends Controller
     {
         $request->validate([
             'instructor_name' => 'required|string|max:255',
-            'availability' => 'required|array|min:1',
-            'availability.*' => 'in:Monday,Tuesday,Wednesday,Thursday,Friday',
+            //'availability' => 'required|array|min:1',
+            //'availability.*' => 'in:Monday,Tuesday,Wednesday,Thursday,Friday',
             'department_id' => 'required|exists:departments,department_id',
         ]);
 
         $instructor = Instructor::findOrFail($id);
         $instructor->update([
             'instructor_name' => $request->instructor_name,
-            'availability' => json_encode($request->availability),
+            //'availability' => json_encode($request->availability),
             'department_id' => $request->department_id,
         ]);
 

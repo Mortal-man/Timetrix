@@ -11,13 +11,6 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Availability</label><br>
-                @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] as $day)
-                    <input type="checkbox" name="availability[]" value="{{ $day }}"> {{ $day }}<br>
-                @endforeach
-            </div>
-
-            <div class="mb-3">
                 <label class="form-label">Department</label>
                 <select name="department_id" class="form-control" required>
                     <option value="">-- Select Department --</option>

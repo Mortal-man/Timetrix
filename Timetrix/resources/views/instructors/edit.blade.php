@@ -13,11 +13,16 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Availability</label><br>
-                @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] as $day)
-                    <input type="checkbox" name="availability[]" value="{{ $day }}"
-                        {{ in_array($day, json_decode($instructor->availability)) ? 'checked' : '' }}> {{ $day }}<br>
-                @endforeach
+                <label class="form-label">Department</label>
+                <select name="department_id" class="form-control" required>
+                    <option value="">-- Select Department --</option>
+                    @foreach ($departments as $department)
+                        <option value="{{ $department->department_id }}"
+                            {{ isset($instructor) && $instructor->department_id == $department->department_id ? 'selected' : '' }}>
+                            {{ $department->department_name }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
             <button type="submit" class="btn btn-success">Update</button>

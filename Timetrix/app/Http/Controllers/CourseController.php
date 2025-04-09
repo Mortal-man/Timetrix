@@ -6,18 +6,39 @@ use App\Models\Course;
 use App\Models\Instructor;
 use App\Models\Department;
 use Illuminate\Http\Request;
-
+use App\Models\Faculty;
 class CourseController extends Controller
 {
     /**
      * Display a listing of courses.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $courses = Course::with(['instructor', 'department'])->paginate(10);
-        return view('courses.index', compact('courses'));
-    }
+        $query = Course::with(['instructor', 'department']);
 
+        // Department filter
+        if ($request->has('department_id') && $request->department_id) {
+            $query->where('department_id', $request->department_id);
+        }
+
+        // Search filter
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('course_name', 'like', "%$search%")
+                    ->orWhere('course_code', 'like', "%$search%")
+                    ->orWhereHas('instructor', function($q) use ($search) {
+                        $q->where('instructor_name', 'like', "%$search%");
+                    });
+            });
+        }
+
+        $courses = $query->paginate(10);
+        $departments = Department::all();
+        $faculties = Faculty::with('departments')->get();
+
+        return view('courses.index', compact('courses', 'departments', 'faculties'));
+    }
     /**
      * Show the form for creating a new course.
      */
@@ -39,7 +60,6 @@ class CourseController extends Controller
             'instructor_id' => 'required|exists:instructors,instructor_id', // Ensure instructor exists
             'student_enrollment' => 'required|integer|min:1',
             'department_id' => 'required|exists:departments,department_id', // Ensure department exists
-            'semester' => 'required|string|max:255',
         ]);
 
         Course::create([
@@ -48,7 +68,6 @@ class CourseController extends Controller
             'instructor_id' => $request->instructor_id,
             'student_enrollment' => $request->student_enrollment,
             'department_id' => $request->department_id,
-            'semester' => $request->semester,
         ]);
 
         return redirect()->route('courses.index')->with('success', 'Course added successfully.');
@@ -76,7 +95,6 @@ class CourseController extends Controller
             'instructor_id' => 'required|exists:instructors,instructor_id',
             'student_enrollment' => 'required|integer|min:1',
             'department_id' => 'required|exists:departments,department_id',
-            'semester' => 'required|string|max:255',
         ]);
 
         $course = Course::findOrFail($id);
@@ -86,7 +104,6 @@ class CourseController extends Controller
             'instructor_id' => $request->instructor_id,
             'student_enrollment' => $request->student_enrollment,
             'department_id' => $request->department_id,
-            'semester' => $request->semester,
         ]);
 
         return redirect()->route('courses.index')->with('success', 'Course updated successfully.');

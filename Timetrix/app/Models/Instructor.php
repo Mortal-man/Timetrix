@@ -13,13 +13,13 @@ class Instructor extends Model
 
     protected $fillable = [
         'instructor_name',
-        'availability',
+        //'availability',
         'department_id',
     ];
 
-    protected $casts = [
-        'availability' => 'array', // Store availability as JSON array
-    ];
+   // protected $casts = [
+   //     'availability' => 'array', // Store availability as JSON array
+   // ];
 
     public function department()
     {

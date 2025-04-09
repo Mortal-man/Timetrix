@@ -16,7 +16,6 @@ class Course extends Model
         'instructor_id',
         'student_enrollment',
         'department_id',
-        'semester',
     ];
 
     // Relationships

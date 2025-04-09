@@ -15,7 +15,6 @@ class CreateCoursesTable extends Migration
             $table->unsignedBigInteger('instructor_id'); // column for the foreign key
             $table->integer('student_enrollment');
             $table->unsignedBigInteger('department_id'); // Column for the foreign key
-            $table->string('semester');
             $table->timestamps();
         });
     }

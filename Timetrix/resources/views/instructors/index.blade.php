@@ -12,9 +12,7 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>ID</th>
                 <th>Name</th>
-                <th>Availability</th>
                 <th>Department</th>
                 <th>Actions</th>
             </tr>
@@ -22,9 +20,7 @@
             <tbody>
             @foreach ($instructors as $instructor)
                 <tr>
-                    <td>{{ $instructor->instructor_id }}</td>
                     <td>{{ $instructor->instructor_name }}</td>
-                    <td>{{ implode(', ', json_decode($instructor->availability)) }}</td>
                     <td>{{ $instructor->department->department_name }}</td>
                     <td>
                         <a href="{{ route('instructors.edit', $instructor) }}" class="btn btn-warning btn-sm">Edit</a>

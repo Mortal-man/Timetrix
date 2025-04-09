@@ -5,8 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class Timetable extends Model
 {
+    use HasFactory;
+
+    protected $fillable = [
+        'day', // 🛠️ Added day to allow mass assignment
+        'hour',
+        'course_id',
+        'instructor_id',
+        'classroom_id',
+        ];
     public function course()
     {
         return $this->belongsTo(Course::class, 'course_id', 'course_id');

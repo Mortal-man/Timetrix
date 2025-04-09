@@ -1,0 +1,94 @@
+/* Force Khand font */
+/* Force Urbanist font for the entire website */
+body, h1, h2, h3, h4, h5, h6, p, blockquote, .button, .navbar, .form-control, .card-title, label, input, textarea, select, button, .other-elements {
+    font-family: 'Mulish', sans-serif !important;
+}
+
+
+p, blockquote {
+    font-family: 'Mulish', sans-serif;
+}
+
+/* Force Montserrat font for specific elements */
+.button, .navbar {
+    font-family: 'Mulish', sans-serif;
+}
+
+/* Force Urbanist font for specific elements */
+.form-control, .card-title {
+    font-family: 'Mulish', sans-serif;
+}
+
+
+
+/* Style for the toggle switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px; /* Adjust the width as needed */
+    height: 25px;/* Adjust the height as needed */
+}
+
+.toggle-checkbox {
+    display: none;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: red; /* Background color for the "off" state */
+    transition: 0.4s;
+    border-radius: 25px; /* Round slider */
+}
+
+.toggle-checkbox:checked + .toggle-slider {
+    background-color: green; /* Background color for the "on" state */
+}
+
+/* Style the slider's appearance when in the "on" state */
+.toggle-checkbox:checked + .toggle-slider:before {
+    transform: translateX(25px); /* Move slider to the "on" position */
+    content: ''; /* This pseudo-element is used for the appearance of the slider handle */
+    position: absolute;
+    width: 20px; /* Handle width */
+    height: 20px; /* Handle height */
+    left: 2.5px; /* Position the handle */
+    bottom: 2.5px;
+    background-color: white; /* Handle color */
+    border-radius: 50%; /* Round handle */
+    transition: 0.4s; /* Smooth transition */
+}
+.custom-box {
+    cursor: pointer; /* Add pointer cursor to indicate it's clickable */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Box shadow */
+    background-color: #4CAF50; /* Green background color */
+    border-radius: 5px; /* Rounded corners */
+    color: white; /* Text color */
+    padding: 5px; /* Padding inside the box */
+    position: relative; /* Required for arrow icon positioning */
+    border-bottom: 2px solid red; /* Add a thin red line at the top */
+}
+
+
+.custom-box .arrow-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    transition: transform 0.2s; /* Add a smooth transition effect */
+}
+
+.custom-box.collapsed .arrow-icon {
+    transform: rotate(180deg); /* Rotate the arrow icon when collapsed */
+}
+
+.custom-box.collapsed .content {
+    display: none; /* Hide content when collapsed */
+}
+
+.content {
+    display: block; /* Initially display the content */
+}

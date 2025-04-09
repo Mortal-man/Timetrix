@@ -50,11 +50,6 @@
                 <input type="number" name="student_enrollment" class="form-control" value="{{ old('student_enrollment', $course->student_enrollment ?? '') }}" min="1" required>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Semester</label>
-                <input type="text" name="semester" class="form-control" value="{{ old('semester', $course->semester ?? '') }}" required>
-            </div>
-
             <button type="submit" class="btn btn-primary">{{ isset($course) ? 'Update' : 'Save' }}</button>
         </form>
     </div>

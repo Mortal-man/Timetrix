@@ -7,7 +7,10 @@ use App\Models\Course;
 use App\Models\Instructor;
 use App\Models\Classroom;
 use App\Models\Timetable;
+use App\Models\Department;
 use Barryvdh\DomPDF\Facade\Pdf; // Import DomPDF
+use App\Helpers\AcademicHelper;
+
 
 class TimetableController extends Controller
 {
@@ -16,9 +19,12 @@ class TimetableController extends Controller
      */
     public function index()
     {
-        $timetable = \App\Models\Timetable::with(['course', 'instructor', 'classroom'])->get();
-        $instructors = Instructor::all();
-        return view('timetable.index', compact('timetable','instructors'));
+        $timetable = \App\Models\Timetable::with(['course.department', 'instructor', 'classroom'])->get();
+        $instructors = \App\Models\Instructor::all();
+        $faculties = \App\Models\Faculty::with('departments')->get();
+        $departments = \App\Models\Department::all();
+
+        return view('timetable.index', compact('timetable', 'instructors', 'faculties', 'departments'));
     }
 
     public function generate()
@@ -31,8 +37,7 @@ class TimetableController extends Controller
         $classrooms = Classroom::orderBy('capacity', 'asc')->get(); // Sort classrooms by capacity
 
         $unscheduledCourses = [];
-// Track the instructor's next available slot after scheduling
-        $instructorNextAvailable = [];
+        $instructorNextAvailable = []; // Track the instructor's next available slot after scheduling
 
         foreach ($courses as $course) {
             $instructor = $course->instructor;
@@ -42,21 +47,14 @@ class TimetableController extends Controller
                 continue;
             }
 
-            $availability = json_decode($instructor->availability, true);
-            if (!$availability || empty($availability)) {
-                \Log::warning("Instructor ID: {$instructor->instructor_id} has no availability set for Course ID: {$course->course_id}.");
-                $unscheduledCourses[] = $course;
-                continue;
-            }
-
-            $remainingHours = 3;
+            $remainingHours = 3; // Assuming each course requires 3 hours per week
             $scheduled = false;
             $sessionOptions = [[3], [2, 1], [1, 1, 1]];
             shuffle($sessionOptions);
 
             foreach ($sessionOptions as $option) {
                 foreach ($option as $session) {
-                    foreach ($availability as $day) { // Prioritize instructor's available days
+                    foreach ($days as $day) { // Assume availability on all weekdays
                         if ($remainingHours <= 0) break;
 
                         $nextAvailableHour = $instructorNextAvailable[$instructor->instructor_id][$day] ?? 7; // Default to 7 AM
@@ -111,7 +109,6 @@ class TimetableController extends Controller
             }
         }
 
-
         session(['unscheduled_courses' => $unscheduledCourses]);
 
         if (!empty($unscheduledCourses)) {
@@ -120,7 +117,6 @@ class TimetableController extends Controller
 
         return redirect()->route('timetable.index')->with('success', 'Timetable generated successfully!');
     }
-
 
     public function manual()
     {
@@ -152,14 +148,47 @@ class TimetableController extends Controller
         return redirect()->route('timetable.manual')->with('success', 'Course manually scheduled successfully!');
     }
 
-    public function view()
+    public function view(Request $request)
     {
-        $timetable = Timetable::with(['course', 'instructor', 'classroom'])->get();
-        $courses = Course::all();
-        $instructors = Instructor::all();
-        $classrooms = Classroom::orderBy('capacity', 'asc')->get();
+        // Get academic session
+        $academicSession = AcademicHelper::getCurrentAcademicSession();
 
-        return view('timetable.view', compact('timetable', 'courses', 'instructors', 'classrooms'));
+        // Check if a department filter was applied
+        $departmentId = $request->input('department_id');
+
+        // Query timetable entries
+        $query = Timetable::with(['course', 'instructor', 'classroom']);
+
+        if ($departmentId) {
+            $query->whereHas('course', function ($q) use ($departmentId) {
+                $q->where('department_id', $departmentId);
+            });
+        }
+
+        $timetableEntries = $query->get();
+
+        // Prepare timetable data in grid format (Day → Hour → [entries])
+        $timetableData = [];
+
+        foreach ($timetableEntries as $entry) {
+            $day = $entry->day;
+            $hour = $entry->hour;
+
+            $timetableData[$day][$hour][] = [
+                'course_code' => optional($entry->course)->course_code ?? 'N/A',
+                'instructor' => optional($entry->instructor)->instructor_name ?? 'N/A',
+                'classroom' => optional($entry->classroom)->room_name ?? 'N/A',
+            ];
+        }
+
+        // Optionally fetch department name for display
+        $departmentName = null;
+        if ($departmentId) {
+            $department = \App\Models\Department::find($departmentId);
+            $departmentName = $department ? $department->department_name : null;
+        }
+
+        return view('timetable.view', compact('timetableData', 'academicSession', 'departmentId', 'departmentName'));
     }
 
     public function updateEntry(Request $request)
@@ -192,49 +221,108 @@ class TimetableController extends Controller
         $timetableData = [];
 
         // Fetch all timetable entries with relationships
-        $timetables = Timetable::with(['course.department.faculty', 'instructor', 'classroom'])->get();
+        $timetables = Timetable::with(['course', 'instructor', 'classroom'])->get();
 
+        // Initialize empty structure
         foreach ($days as $day) {
-            $timetableData[$day] = [];
+            $timetableData[$day] = []; // No faculties/departments, just courses
+        }
 
-            foreach ($timetables->where('day', $day) as $entry) {
-                $faculty = $entry->course->department->faculty->faculty_name ?? 'Unknown Faculty';
-                $department = $entry->course->department->department_name ?? 'Unknown Department';
-                $courseName = $entry->course->course_name ?? 'Unknown Course';
-                $instructor = $entry->instructor->instructor_name ?? 'No Instructor';
-                $classroom = $entry->classroom->room_name ?? 'No Room';
+        foreach ($timetables as $entry) {
+            $day = $entry->day;
+            $hour = $entry->hour;
 
-                // Initialize faculty and department if not set
-                $timetableData[$day][$faculty][$department] = $timetableData[$day][$faculty][$department] ?? [];
-
-                // Place course details into the correct time slots
-                foreach ($timeSlots as $hour) {
-                    if ($entry->hour == $hour) { // Assuming 'hour' is a property of the entry
-                        $timetableData[$day][$faculty][$department][$hour] = [
-                            'course_name' => $courseName,
-                            'instructor' => $instructor,
-                            'classroom' => $classroom,
-                        ];
-                    }
-                }
+            if (!isset($timetableData[$day][$hour])) {
+                $timetableData[$day][$hour] = []; // Initialize time slot
             }
+
+            $timetableData[$day][$hour][] = [
+                'course_code' => $entry->course->course_code ?? 'N/A',
+                'instructor' => $entry->instructor->instructor_name ?? 'No Instructor',
+                'classroom' => $entry->classroom->room_name ?? 'No Room',
+            ];
         }
 
         return $timetableData;
     }
 
-    /**
-     * Generate and download the timetable PDF.
-     */
 
-    public function generatePDF()
+    public function getDepartments(Request $request)
     {
+        $facultyId = $request->faculty_id;
+        $departments = Department::where('faculty_id', $facultyId)->get();
+
+        return response()->json($departments);
+    }
+    public function generatePdf(Request $request)
+    {
+        $academicSession = AcademicHelper::getCurrentAcademicSession();
+
+        // Define available days and time slots
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
         $timeSlots = range(7, 17); // 7 AM to 5 PM
-        $faculties = Course::with(['department.faculty'])->get()->groupBy('department.faculty.faculty_name');
-        $timetable = Timetable::with(['course.department.faculty', 'instructor', 'classroom'])->get();
 
-        $pdf = Pdf::loadView('timetable.pdf', compact('days', 'timeSlots', 'faculties', 'timetable'));
-        return $pdf->setPaper('a4', 'landscape')->download('Timetable.pdf');
+        // Check for department filter
+        $departmentId = $request->input('department_id');
+
+        $query = Timetable::with(['course', 'classroom']);
+
+        if ($departmentId) {
+            $query->whereHas('course', function ($q) use ($departmentId) {
+                $q->where('department_id', $departmentId);
+            });
+        }
+
+        $timetableEntries = $query->get();
+
+        // Initialize timetable structure
+        $timetableData = [];
+        foreach ($days as $day) {
+            foreach ($timeSlots as $hour) {
+                $timetableData[$day][$hour] = []; // Empty by default
+            }
+        }
+
+        // Fill with actual entries
+        foreach ($timetableEntries as $entry) {
+            $day = $entry->day;
+            $hour = (int) $entry->hour;
+
+            if (isset($timetableData[$day][$hour])) {
+                $timetableData[$day][$hour][] = [
+                    'course_code' => optional($entry->course)->course_code ?? 'N/A',
+                    'classroom' => optional($entry->classroom)->room_name ?? 'N/A',
+                ];
+            }
+        }
+
+        // PDF metadata
+        $institutionName = "Egerton University";
+        $title = "Teaching Master Timetable";
+        $semester = $academicSession['semester'];
+        $academicYear = $academicSession['academic_year'];
+        $effectiveDate = date('F j, Y');
+
+        // Department name (optional)
+        $departmentName = null;
+        if ($departmentId) {
+            $department = \App\Models\Department::find($departmentId);
+            $departmentName = $department ? $department->department_name : null;
+        }
+
+        $pdf = Pdf::loadView('pdf', compact(
+            'institutionName',
+            'title',
+            'semester',
+            'academicYear',
+            'effectiveDate',
+            'timetableData',
+            'timeSlots',
+            'days',
+            'departmentName'
+        ))->setPaper('a4', 'landscape');
+
+        return $pdf->stream('timetable.pdf');
     }
+
 }

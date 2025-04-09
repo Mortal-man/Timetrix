@@ -97,7 +97,8 @@
 <body>
 
 <header>
-    <img src="https://via.placeholder.com/160" alt="Timetrix Logo" class="logo">
+    <!-- Add the logo here -->
+    <img class="logo" src="{{ asset('favicon/favicon_512x512_Nero_AI_Image_Upscaler_Photo_Face-Photoroom.png') }}" alt="Timetrix Logo">
     <nav class="nav-links">
         @if (Route::has('login'))
             @auth
