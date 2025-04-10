@@ -11,7 +11,7 @@
                 <input type="text" class="form-control" name="faculty_name" value="{{ $faculty->faculty_name }}" required>
             </div>
             <button type="submit" class="btn btn-primary">Update</button>
+            <a href="{{ route('faculties.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 @endsection
-

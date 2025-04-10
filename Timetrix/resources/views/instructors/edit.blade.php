@@ -18,7 +18,7 @@
                     <option value="">-- Select Department --</option>
                     @foreach ($departments as $department)
                         <option value="{{ $department->department_id }}"
-                            {{ isset($instructor) && $instructor->department_id == $department->department_id ? 'selected' : '' }}>
+                            {{ $instructor->department_id == $department->department_id ? 'selected' : '' }}>
                             {{ $department->department_name }}
                         </option>
                     @endforeach
@@ -26,6 +26,7 @@
             </div>
 
             <button type="submit" class="btn btn-success">Update</button>
+            <a href="{{ route('instructors.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 @endsection

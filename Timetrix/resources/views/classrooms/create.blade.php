@@ -14,6 +14,7 @@
                 <input type="number" name="capacity" class="form-control" id="capacity" required>
             </div>
             <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{{ route('classrooms.index') }}" class="btn btn-secondary">Back</a> <!-- Back button -->
         </form>
     </div>
 @endsection

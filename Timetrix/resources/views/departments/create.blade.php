@@ -32,6 +32,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{{ route('departments.index') }}" class="btn btn-secondary">Back</a>
         </form>
     </div>
 @endsection

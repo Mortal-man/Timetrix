@@ -10,6 +10,7 @@
                 <input type="text" class="form-control" name="faculty_name" required>
             </div>
             <button type="submit" class="btn btn-success">Save</button>
+            <a href="{{ route('faculties.index') }}" class="btn btn-secondary">Back</a>
         </form>
     </div>
 @endsection

@@ -3,7 +3,7 @@
 @section('title', 'Timetrix')
 
 @section('css')
-    <!-- Custom Fonts and Styles -->
+    <!-- Global Custom Fonts and Styles -->
     <link href="{{ asset('css/custom_fonts.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap">
@@ -30,22 +30,20 @@
             background-color: #f8f9fc;
         }
 
-        /* Hover effect for cards */
         .card-custom:hover {
-            transform: translateY(-5px); /* Moves the card slightly up */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adds shadow on hover */
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Dark Mode Overrides */
+        /* Dark Mode */
         body.dark-mode {
             background-color: #343a40;
-            color: #f8f9fc; /* Make text white */
+            color: #f8f9fc;
         }
 
-        /* Ensure all card text and other content are white */
         body.dark-mode .card-custom {
             background-color: #495057 !important;
-            color: #f8f9fc !important; /* Make card text white */
+            color: #f8f9fc !important;
         }
 
         body.dark-mode .card-header {
@@ -58,16 +56,15 @@
             color: #f8f9fc !important;
         }
 
-        /* Ensure all text (headings, paragraphs, etc.) are white in dark mode */
         body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
-            color: #f8f9fc; /* Ensure headings are white */
+            color: #f8f9fc;
         }
 
         body.dark-mode p, body.dark-mode span, body.dark-mode .card-text {
-            color: #f8f9fc; /* Make paragraph and card text white */
+            color: #f8f9fc;
         }
 
-        /* Button for dark mode toggle */
+        /* Toggle Switch */
         #themeToggle {
             background-color: transparent;
             border: none;
@@ -79,7 +76,6 @@
             color: #f8f9fc;
         }
 
-        /* Slide Toggle Styles */
         .switch {
             position: relative;
             display: inline-block;
@@ -125,9 +121,8 @@
             transform: translateX(26px);
         }
 
-        /* Icons in the switch */
         .slider::after {
-            content: "\f186"; /* Font Awesome sun icon */
+            content: "\f186";
             font-family: 'Font Awesome 5 Free';
             position: absolute;
             top: 50%;
@@ -137,25 +132,26 @@
         }
 
         input:checked + .slider::after {
-            content: "\f185"; /* Font Awesome moon icon */
+            content: "\f185";
             left: 30px;
         }
-
     </style>
+
+    @stack('styles')
 @endsection
 
 @section('content')
-    <!-- Academic Session Header -->
     @php
         use App\Helpers\AcademicHelper;
         $academicSession = AcademicHelper::getCurrentAcademicSession();
     @endphp
 
+        <!-- Academic Header -->
     <div class="container-fluid bg-dark text-white p-2 text-center">
         <h6>{{ $academicSession['semester'] }} - Academic Year {{ $academicSession['academic_year'] }}</h6>
     </div>
 
-    <!-- Theme Toggle Button -->
+    <!-- Dark Mode Toggle -->
     <div class="container-fluid text-right p-2">
         <label class="switch">
             <input type="checkbox" id="themeToggle">
@@ -163,7 +159,7 @@
         </label>
     </div>
 
-    <!-- Main Content -->
+    <!-- Yielded Main Content -->
     <div class="container-fluid">
         @yield('main-content')
     </div>
@@ -182,24 +178,18 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             const themeToggleCheckbox = $('#themeToggle');
             const body = $('body');
 
-            // Check for saved theme preference (default to light if not set)
             const savedTheme = localStorage.getItem('theme') || 'light';
 
-            // Apply saved theme
             if (savedTheme === 'dark') {
                 body.addClass('dark-mode');
                 themeToggleCheckbox.prop('checked', true);
-            } else {
-                body.removeClass('dark-mode');
-                themeToggleCheckbox.prop('checked', false);
             }
 
-            // Toggle the theme
-            themeToggleCheckbox.on('change', function() {
+            themeToggleCheckbox.on('change', function () {
                 if (themeToggleCheckbox.prop('checked')) {
                     body.addClass('dark-mode');
                     localStorage.setItem('theme', 'dark');
@@ -210,4 +200,6 @@
             });
         });
     </script>
+
+    @stack('scripts')
 @endsection

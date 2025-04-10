@@ -15,8 +15,7 @@
                 <select name="department_id" class="form-control" required>
                     <option value="">-- Select Department --</option>
                     @foreach ($departments as $department)
-                        <option value="{{ $department->department_id }}"
-                            {{ isset($instructor) && $instructor->department_id == $department->department_id ? 'selected' : '' }}>
+                        <option value="{{ $department->department_id }}">
                             {{ $department->department_name }}
                         </option>
                     @endforeach
@@ -24,6 +23,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{{ route('instructors.index') }}" class="btn btn-secondary">Back</a>
         </form>
     </div>
 @endsection

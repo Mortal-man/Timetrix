@@ -51,6 +51,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">{{ isset($course) ? 'Update' : 'Save' }}</button>
+            <a href="{{ route('courses.index') }}" class="btn btn-secondary">Back</a>
         </form>
     </div>
 
