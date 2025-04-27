@@ -53009,4 +53009,41 @@ a.text-muted:hover {
 .dark-mode .border-dark {
   border-color: #4b545c !important;
 }
+/* Custom dropdown styling */
+.user-menu .dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+    min-width: 12rem;
+}
+
+.user-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+}
+
+.user-menu .dropdown-item i {
+    width: 1.25rem;
+    text-align: center;
+}
+
+.user-menu .dropdown-header {
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.dark-mode .user-menu .dropdown-menu {
+    background-color: #1f2937;
+    border-color: #374151;
+}
+
+.dark-mode .user-menu .dropdown-item {
+    color: #f3f4f6;
+}
+
+.dark-mode .user-menu .dropdown-item:hover {
+    background-color: #374151;
+}
 /*# sourceMappingURL=adminlte.css.map */

@@ -25,6 +25,20 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'contact' => ['nullable', 'string', 'max:20'], // New: Contact number (optional)
+            'profile_photo' => ['nullable', 'image', 'max:2048'], // New: Profile photo upload (optional, max 2MB)
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('email')) {
+            $this->merge([
+                'email' => strtolower($this->input('email')),
+            ]);
+        }
     }
 }

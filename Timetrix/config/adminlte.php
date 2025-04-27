@@ -116,8 +116,8 @@ return [
             'path' => 'favicon/favicon_512x512_Nero_AI_Image_Upscaler_Photo_Face.png',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
-            'width' => 60,
-            'height' => 60,
+            'width' => 80,
+            'height' => 80,
         ],
     ],
 
@@ -134,11 +134,11 @@ return [
     */
 
     'usermenu_enabled' => true,
-    'usermenu_header' => false,
+    'usermenu_header' => true,
     'usermenu_header_class' => 'bg-primary',
-    'usermenu_image' => false,
-    'usermenu_desc' => false,
-    'usermenu_profile_url' => false,
+    'usermenu_image' => true,
+    'usermenu_desc' => true,
+    'usermenu_profile_url' => 'profile',
 
     /*
     |--------------------------------------------------------------------------
@@ -152,12 +152,12 @@ return [
     |
     */
 
-    'layout_topnav' => null,
+    'layout_topnav' => false,
     'layout_boxed' => null,
     'layout_fixed_sidebar' => null,
-    'layout_fixed_navbar' => null,
+    'layout_fixed_navbar' => true,
     'layout_fixed_footer' => null,
-    'layout_dark_mode' => null,
+    'layout_dark_mode' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -198,7 +198,7 @@ return [
     'classes_content' => '',
     'classes_sidebar' => 'sidebar-dark-primary elevation-4',
     'classes_sidebar_nav' => '',
-    'classes_topnav' => 'navbar-white navbar-light',
+    'classes_topnav' => 'navbar-dark navbar-light',
     'classes_topnav_nav' => 'navbar-expand',
     'classes_topnav_container' => 'container',
 
@@ -257,13 +257,13 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'home',
+    'dashboard_url' => 'dashboard',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
     'password_reset_url' => 'password/reset',
     'password_email_url' => 'password/email',
-    'profile_url' => false,
+    'profile_url' => null,
     'disable_darkmode_routes' => false,
 
     /*
@@ -301,42 +301,81 @@ return [
     'menu' => [
 
         [
-            'text'        => 'Dashboard',
-            'url'         => 'dashboard',
-            'icon'        => 'fas fa-fw fa-tachometer-alt',
+            'text' => 'Dashboard',
+            'url'  => 'dashboard',
+            'icon' => 'fas fa-fw fa-tachometer-alt',
+
         ],
         ['header' => 'Management'],
         [
-            'text'        => 'Faculties',
-            'url'         => 'faculties',
-            'icon'        => 'fas fa-fw fa-graduation-cap',
+            'text' => 'Faculties',
+            'url'  => 'faculties',
+            'icon' => 'fas fa-fw fa-graduation-cap',
         ],
         [
-            'text'        => 'Departments',
-            'url'         => 'departments',
-            'icon'        => 'fas fa-fw fa-building',
+            'text' => 'Departments',
+            'url'  => 'departments',
+            'icon' => 'fas fa-fw fa-building',
         ],
         [
-            'text'        => 'Instructors',
-            'url'         => 'instructors',
-            'icon'        => 'fas fa-fw fa-chalkboard-teacher',
+            'text' => 'Instructors',
+            'url'  => 'instructors',
+            'icon' => 'fas fa-fw fa-chalkboard-teacher',
         ],
         [
-            'text'        => 'Courses',
-            'url'         => 'courses',
-            'icon'        => 'fas fa-fw fa-book',
+            'text' => 'Courses',
+            'url'  => 'courses',
+            'icon' => 'fas fa-fw fa-book',
         ],
         [
-            'text'        => 'Classrooms',
-            'url'         => 'classrooms',
-            'icon'        => 'fas fa-fw fa-school',
+            'text' => 'Classrooms',
+            'url'  => 'classrooms',
+            'icon' => 'fas fa-fw fa-school',
         ],
         [
-            'text'        => 'Timetable',
-            'url'         => 'timetable',
-            'icon'        => 'fas fa-fw fa-table',
+            'text' => 'Timetable',
+            'url'  => 'timetable',
+            'icon' => 'fas fa-fw fa-table',
         ],
 
+        // ✅ Reports section inserted here
+        [
+            'text'    => 'Reports',
+            'icon'    => 'fas fa-fw fa-file-alt',
+            'submenu' => [
+                [
+                    'text' => 'Academic Reports',
+                    'url'  => 'reports/academic',
+                    'icon' => 'fas fa-fw fa-book-open',
+                ],
+            ],
+        ],
+
+        // ⚙ Settings
+        [
+            'text'    => 'Settings',
+            'icon'    => 'fas fa-fw fa-cog',
+            'submenu' => [
+                [
+                    'text' => 'Institution Details',
+                    'url'  => 'institution',
+                    'icon' => 'fas fa-fw fa-university',
+                    'description' => 'Configure institution details',
+                ],
+                [
+                    'text' => 'Users',
+                    'url'  => 'users',
+                    'icon' => 'fas fa-fw fa-users',
+                    'description' => 'Manage registered users',
+                ],
+                [
+                    'text' => 'System Audits',
+                    'url'  => 'audits',
+                    'icon' => 'fas fa-fw fa-clipboard-list',
+                    'description' => 'Track user CRUD operations',
+                ],
+            ],
+        ],
     ],
 
     /*

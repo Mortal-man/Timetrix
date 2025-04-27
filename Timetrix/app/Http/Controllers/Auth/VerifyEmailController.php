@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
+use App\Models\User; // Add this import
 
 class VerifyEmailController extends Controller
 {
@@ -14,14 +15,16 @@ class VerifyEmailController extends Controller
      */
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
-        if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(route('dashboard', absolute: false).'?verified=1');
+        $user = User::findOrFail($request->route('id')); // Now correctly referenced
+
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->route('verification.already');
         }
 
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
-        }
+        $user->markEmailAsVerified();
+        event(new Verified($user));
 
-        return redirect()->intended(route('dashboard', absolute: false).'?verified=1');
+        auth()->logout();
+        return redirect()->route('verification.success');
     }
 }

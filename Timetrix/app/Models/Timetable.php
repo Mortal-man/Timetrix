@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable;
 
-
-class Timetable extends Model
+class Timetable extends Model implements AuditableContract
 {
-    use HasFactory;
+    use HasFactory, Auditable;
 
     protected $fillable = [
         'day', // 🛠️ Added day to allow mass assignment
@@ -16,7 +17,8 @@ class Timetable extends Model
         'course_id',
         'instructor_id',
         'classroom_id',
-        ];
+    ];
+
     public function course()
     {
         return $this->belongsTo(Course::class, 'course_id', 'course_id');
