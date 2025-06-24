@@ -157,7 +157,7 @@ return [
     'layout_fixed_sidebar' => null,
     'layout_fixed_navbar' => true,
     'layout_fixed_footer' => null,
-    'layout_dark_mode' => true,
+    'layout_dark_mode' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -362,12 +362,12 @@ return [
                     'icon' => 'fas fa-fw fa-university',
                     'description' => 'Configure institution details',
                 ],
-                [
-                    'text' => 'Users',
-                    'url'  => 'users',
-                    'icon' => 'fas fa-fw fa-users',
-                    'description' => 'Manage registered users',
-                ],
+//                [
+//                    'text' => 'Users',
+//                    'url'  => 'users',
+//                    'icon' => 'fas fa-fw fa-users',
+//                    'description' => 'Manage registered users',
+//                ],
                 [
                     'text' => 'System Audits',
                     'url'  => 'audits',

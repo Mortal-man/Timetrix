@@ -136,7 +136,10 @@
             left: 30px;
         }
     </style>
-
+    <style>
+        .pagination { justify-content: center; }
+        .page-item.active .page-link { background: #007bff; border-color: #007bff; }
+    </style>
     @stack('styles')
 @endsection
 

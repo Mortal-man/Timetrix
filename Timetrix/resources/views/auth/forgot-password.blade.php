@@ -21,6 +21,19 @@
     <link rel="mask-icon" href="/images/favicons/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
+
+    <style>
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body class="hold-transition login-page">
@@ -28,7 +41,7 @@
     <!-- Logo -->
     <div class="cover">
         <div class="front">
-            <img src="{{URL('favicon/Timetrix.png')}}" alt="Timetrix Logo">
+            <img src="{{ URL('favicon/Timetrix.png') }}" alt="Timetrix Logo">
         </div>
     </div>
 
@@ -42,8 +55,14 @@
                     {{ __('Forgot your password? No problem. Just let us know your email and we’ll send a reset link.') }}
                 </div>
 
-                <!-- Session Status -->
-                <x-auth-session-status class="mb-4" :status="session('status')" />
+                <!-- Success Notification -->
+                @if (session('status'))
+                    <div class="alert-success">
+                        {{ session('status') }}
+                        <br>
+                        Please check your email inbox (and spam folder).
+                    </div>
+                @endif
 
                 <!-- Form -->
                 <form method="POST" action="{{ route('password.email') }}">
@@ -69,9 +88,17 @@
                         </div>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
 </div>
 </body>
 </html>
+<script>
+    $(document).ready(function() {
+        setTimeout(function() {
+            $('.alert-success').fadeOut('slow');
+        }, 5000); // 5 seconds
+    });
+</script>

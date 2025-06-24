@@ -12,7 +12,6 @@
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>Department ID</th>
                 <th>Department Name</th>
                 <th>Faculty</th>
                 <th>Actions</th>
@@ -21,7 +20,6 @@
             <tbody>
             @foreach ($departments as $department)
                 <tr>
-                    <td>{{ $department->department_id }}</td>
                     <td>{{ $department->department_name }}</td>
                     <td>{{ $department->faculty->faculty_name ?? 'N/A' }}</td>
                     <td>

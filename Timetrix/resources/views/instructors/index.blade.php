@@ -3,7 +3,15 @@
 @section('content')
     <div class="container">
         <h2>Instructors</h2>
-        <a href="{{ route('instructors.create') }}" class="btn btn-primary mb-3">Add Instructor</a>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a href="{{ route('instructors.create') }}" class="btn btn-primary">Add Instructor</a>
+
+            <form method="GET" action="{{ route('instructors.index') }}" class="d-flex">
+                <input type="text" name="search" class="form-control me-2" placeholder="Search name or department" value="{{ request('search') }}">
+                <button type="submit" class="btn btn-outline-secondary">Search</button>
+            </form>
+        </div>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -18,22 +26,29 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($instructors as $instructor)
+            @forelse ($instructors as $instructor)
                 <tr>
                     <td>{{ $instructor->instructor_name }}</td>
                     <td>{{ $instructor->department->department_name ?? 'N/A' }}</td>
                     <td>
-                        <a href="{{ route('instructors.edit', $instructor) }}" class="btn btn-warning btn-sm">Edit</a>
-                        <button class="btn btn-danger btn-sm" onclick="confirmDelete('deleteForm{{ $instructor->id }}')">Delete</button>
-                        <form id="deleteForm{{ $instructor->id }}" action="{{ route('instructors.destroy', $instructor) }}" method="POST" class="d-none">
+                        <a href="{{ route('instructors.edit', $instructor->instructor_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <button class="btn btn-danger btn-sm" onclick="confirmDelete('deleteForm{{ $instructor->instructor_id }}')">Delete</button>
+                        <form id="deleteForm{{ $instructor->instructor_id }}" action="{{ route('instructors.destroy', $instructor->instructor_id) }}" method="POST" class="d-none">
                             @csrf
                             @method('DELETE')
                         </form>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="3" class="text-center">No instructors found.</td>
+                </tr>
+            @endforelse
             </tbody>
         </table>
+
+        <!-- Pagination links -->
+        {{ $instructors->links() }}
     </div>
 
     <!-- Delete Confirmation Modal -->

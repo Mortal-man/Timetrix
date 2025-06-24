@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\Auth\VerificationController;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\OtpController;
-use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AuditController;
@@ -23,7 +23,7 @@ use App\Http\Controllers\ReportController;
 Route::get('/', fn() => view('welcome'));
 
 // -----------------------------------------------------------------------
-// Custom Login + OTP Routes (must come before any Auth::routes())
+// Custom Login + OTP (retain manually)
 // -----------------------------------------------------------------------
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
@@ -31,9 +31,6 @@ Route::get('otp', [OtpController::class, 'showOtpForm'])->name('otp.form');
 Route::post('otp', [OtpController::class, 'verifyOtp'])->name('otp.verify');
 Route::post('/otp/resend', [OtpController::class, 'resendOtp'])->name('otp.resend');
 
-// -----------------------------------------------------------------------
-// Email Verification Routes
-// -----------------------------------------------------------------------
 // Notice (requires temporary guard)
 Route::middleware('auth:temporary')->get('/email/verify', fn() => view('auth.verify-email'))
     ->name('verification.notice');
@@ -51,11 +48,18 @@ Route::middleware(['auth:temporary','throttle:6,1'])
 // Static confirmation pages
 Route::view('/email/already-verified', 'auth.verification-already')->name('verification.already');
 Route::view('/email/verified-success',  'auth.verification-success')->name('verification.success');
+// -----------------------------------------------------------------------
+// Laravel Built-in Auth (excluding login)
+// -----------------------------------------------------------------------
+Auth::routes([
+    'login'  => false, // We're handling login/OTP manually
+    'verify' => true,  // Enable email verification
+]);
 
 // -----------------------------------------------------------------------
 // Dashboard & Profile (requires full auth + verified email)
 // -----------------------------------------------------------------------
-Route::middleware(['auth','verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/profile',  [ProfileController::class, 'edit'])->name('profile.edit');
@@ -89,44 +93,25 @@ Route::middleware('auth')->group(function () {
     Route::post('/timetable/manual',   [TimetableController::class, 'storeManual'])->name('timetable.storeManual');
     Route::get('/timetable/pdf',       [TimetableController::class, 'generatePDF'])->name('timetable.pdf');
     Route::get('/get-departments',     [TimetableController::class, 'getDepartments']);
-
-    // Dynamic fetch
-    Route::get('/instructors-by-department/{department_id}',
-        [CourseController::class, 'getInstructorsByDepartment']
-    );
+    Route::get('/instructors-by-department/{department_id}', [CourseController::class, 'getInstructorsByDepartment']);
 });
 
 // -----------------------------------------------------------------------
 // Academic Reports
 // -----------------------------------------------------------------------
-Route::middleware('auth')->group(function () {
-    Route::view('reports/academic',      'reports.academic')->name('reports.academic');
-    Route::view('reports/administrative','reports.administrative')->name('reports.administrative');
+Route::middleware('auth')->prefix('reports/academic')->name('reports.academic.')->group(function () {
+    Route::view('/', 'reports.academic')->name('index');
 
-    Route::prefix('reports/academic')->name('reports.academic.')->group(function () {
-        Route::get('instructor-workload',         [ReportController::class, 'instructorWorkload'])
-            ->name('instructorWorkload');
-        Route::get('instructor-workload/pdf',     [ReportController::class, 'instructorWorkloadPdf'])
-            ->name('instructorWorkload.pdf');
+    Route::get('instructor-workload',       [ReportController::class, 'instructorWorkload'])->name('instructorWorkload');
+    Route::get('instructor-workload/pdf',   [ReportController::class, 'instructorWorkloadPdf'])->name('instructorWorkload.pdf');
 
-        Route::get('course-offering-summary',     [ReportController::class, 'courseOfferingSummary'])
-            ->name('courseOfferingSummary');
-        Route::get('course-offering-summary/pdf', [ReportController::class, 'courseOfferingSummaryPdf'])
-            ->name('courseOfferingSummaryPdf');
+    Route::get('course-offering-summary',     [ReportController::class, 'courseOfferingSummary'])->name('courseOfferingSummary');
+    Route::get('course-offering-summary/pdf', [ReportController::class, 'courseOfferingSummaryPdf'])->name('courseOfferingSummaryPdf');
 
-        Route::get('enrollment-summary',          [ReportController::class, 'enrollmentSummary'])
-            ->name('enrollmentSummary');
-        Route::get('enrollment-summary/pdf',      [ReportController::class, 'enrollmentSummaryPdf'])
-            ->name('enrollmentSummaryPdf');
+    Route::get('enrollment-summary',       [ReportController::class, 'enrollmentSummary'])->name('enrollmentSummary');
+    Route::get('enrollment-summary/pdf',   [ReportController::class, 'enrollmentSummaryPdf'])->name('enrollmentSummaryPdf');
 
-        Route::get('instructor-timetable',        [ReportController::class, 'instructorTimetable'])
-            ->name('instructorTimetable');
-        Route::get('instructor-timetable/pdf',    [ReportController::class, 'instructorTimetablePdf'])
-            ->name('instructorTimetable.pdf');
-    });
+    Route::get('instructor-timetable',     [ReportController::class, 'instructorTimetable'])->name('instructorTimetable');
+    Route::get('instructor-timetable/pdf', [ReportController::class, 'instructorTimetablePdf'])->name('instructorTimetable.pdf');
 });
-
-// -----------------------------------------------------------------------
-// Fallback to built-in Auth routes (registration, password reset, etc.)
-// -----------------------------------------------------------------------
-Auth::routes(['verify' => false]);
+require __DIR__.'/auth.php';

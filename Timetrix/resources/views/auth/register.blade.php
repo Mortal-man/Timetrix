@@ -17,6 +17,44 @@
     <link rel="mask-icon" href="/images/favicons/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
+
+    <script>
+        // Validate name - no numbers or special characters
+        function validateForm() {
+            var name = document.forms["registerForm"]["name"].value;
+            var email = document.forms["registerForm"]["email"].value;
+            var password = document.forms["registerForm"]["password"].value;
+            var password_confirmation = document.forms["registerForm"]["password_confirmation"].value;
+            var agreeTerms = document.getElementById('agreeTerms').checked;
+
+            var namePattern = /^[A-Za-z\s]+$/; // Only letters and spaces
+            if (!namePattern.test(name)) {
+                alert("Name should only contain letters and spaces.");
+                return false;
+            }
+
+            // Validate email format (you can rely on HTML5 email validation)
+            var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+            if (!emailPattern.test(email)) {
+                alert("Please enter a valid email address.");
+                return false;
+            }
+
+            // Validate passwords match
+            if (password !== password_confirmation) {
+                alert("Passwords do not match.");
+                return false;
+            }
+
+            // Ensure terms are agreed to
+            if (!agreeTerms) {
+                alert("You must agree to the terms and conditions.");
+                return false;
+            }
+
+            return true; // If all validations pass
+        }
+    </script>
 </head>
 <body class="hold-transition register-page">
 
@@ -24,7 +62,7 @@
     <input type="checkbox" id="flip">
     <div class="cover">
         <div class="front">
-            <img src="{{URL('favicon/Timetrix.png')}}" alt="">
+            <img src="{{URL('favicon/Timetrix.png')}}" alt="Logo">
         </div>
         <div class="back">
             <div class="text">
@@ -37,7 +75,7 @@
         <div class="form-content">
             <div class="login-form">
                 <div class="title">Register</div>
-                <form method="post" action="{{ route('register') }}">
+                <form name="registerForm" method="post" action="{{ route('register') }}" onsubmit="return validateForm()">
                     @csrf
                     <div class="input-boxes">
                         <div class="input-box">
@@ -78,7 +116,7 @@
             </div>
             <div class="support-form">
                 <div class="title">Contact Support</div>
-                <form method="post" action="mailto:support@learnsofthmis.co.ke">
+                <form method="post" action="mailto:ottimanuel714@gmail.com">
                     @csrf
                     <div class="input-boxes">
                         <div class="input-box">

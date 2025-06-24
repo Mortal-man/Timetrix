@@ -23,10 +23,11 @@ class VerificationController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth:temporary'); // <- Use temporary guard
         $this->middleware('signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
     }
+
 
     /**
      * Override the resend method to prevent sending if already verified.
@@ -34,7 +35,7 @@ class VerificationController extends Controller
     public function resend(Request $request)
     {
         // User must be temporarily logged in
-        if (!auth()->guard('temporary')->check()) {
+        if (!auth()->check()) {
             return redirect()->route('login');
         }
 

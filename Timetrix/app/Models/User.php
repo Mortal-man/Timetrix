@@ -21,7 +21,6 @@ class User extends Authenticatable implements AuditableContract, MustVerifyEmail
         'name',
         'email',
         'password',
-        'is_admin',
         'otp_code',
         'otp_expires_at',
         'contact',

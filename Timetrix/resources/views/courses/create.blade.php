@@ -47,7 +47,9 @@
 
             <div class="mb-3">
                 <label class="form-label">Student Enrollment</label>
-                <input type="number" name="student_enrollment" class="form-control" value="{{ old('student_enrollment', $course->student_enrollment ?? '') }}" min="1" required>
+                <input type="number" name="student_enrollment" class="form-control"
+                       value="{{ old('student_enrollment', $course->student_enrollment ?? '') }}"
+                       min="1" max="400" required>
             </div>
 
             <button type="submit" class="btn btn-primary">{{ isset($course) ? 'Update' : 'Save' }}</button>

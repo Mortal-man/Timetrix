@@ -5,9 +5,6 @@
         <!-- Header Section -->
         <div class="d-flex justify-content-between align-items-center mb-5">
             <h2 class="text-uppercase text-primary">Academic Reports</h2>
-            <button id="themeToggle" class="btn btn-sm btn-outline-secondary">
-                <i class="fas fa-moon"></i> Toggle Theme
-            </button>
         </div>
 
         <!-- Reports Grid -->

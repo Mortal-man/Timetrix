@@ -58,7 +58,7 @@ class CourseController extends Controller
             'course_name' => 'required|string|max:255',
             'course_code' => 'required|string|max:255|unique:courses,course_code',
             'instructor_id' => 'required|exists:instructors,instructor_id', // Ensure instructor exists
-            'student_enrollment' => 'required|integer|min:1',
+            'student_enrollment' => 'required|integer|min:1|max:400',
             'department_id' => 'required|exists:departments,department_id', // Ensure department exists
         ]);
 

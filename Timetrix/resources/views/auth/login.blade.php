@@ -79,7 +79,7 @@
             </div>
             <div class="support-form">
                 <div class="title">Contact Support</div>
-                <form method="post" action="mailto:support@learnsofthmis.co.ke">
+                <form method="post" action="mailto:ottimanuel714@gmail.com">
                     @csrf
                     <div class="input-boxes">
                         <div class="input-box">

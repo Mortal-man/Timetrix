@@ -63,6 +63,11 @@
         </div>
     </div>
 
+    <style>
+    .pagination { justify-content: center; }
+    .page-item.active .page-link { background: #007bff; border-color: #007bff; }
+    </style>
+
     <script>
         jQuery(document).ready(function($) {
             $('#audits-reports-table').DataTable({

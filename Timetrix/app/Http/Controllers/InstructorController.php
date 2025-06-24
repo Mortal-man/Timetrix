@@ -11,9 +11,20 @@ class InstructorController extends Controller
     /**
      * Display a listing of instructors.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $instructors = Instructor::with('department')->paginate(10);
+        $query = Instructor::with('department');
+
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where('instructor_name', 'like', "%{$search}%")
+                ->orWhereHas('department', function ($q) use ($search) {
+                    $q->where('department_name', 'like', "%{$search}%");
+                });
+        }
+
+        $instructors = $query->paginate(10)->appends($request->only('search'));
+
         return view('instructors.index', compact('instructors'));
     }
 
